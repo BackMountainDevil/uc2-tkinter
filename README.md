@@ -24,5 +24,7 @@ ImportError: libtk8.6.so: cannot open shared object file: No such file or direct
 
 - [Python GUI之tkinter教程](http://www.coolpython.net/tk/tk_primary/index.html)
 - [Python调用摄像头，实时显示视频在Tkinter界面.lyx4949. 2021-05-20](https://blog.csdn.net/lyx4949/article/details/117086277)
+- [AttributeError: 'PhotoImage' object has no attribute '_PhotoImage__photo'](https://stackoverflow.com/questions/50662773/attributeerror-photoimage-object-has-no-attribute-photoimage-photo):在终端中运行推出后报错，但是代码中已使用 pil 格式的图像，尚不明所以
+- [RuntimeError: Too early to create image [duplicate]](https://stackoverflow.com/questions/53861528/runtimeerror-too-early-to-create-image)：按 F5 使用 vscode 的 python 扩展调试推出后报这个错误，尚未解决。上面的错误这个调试方式下却不会出现，这个错误也不会上面出现。。
 - []()
 - []()

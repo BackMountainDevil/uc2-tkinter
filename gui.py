@@ -35,6 +35,7 @@ def tkImage():
     pilImage = Image.fromarray(cvimage)
     pilImage = pilImage.resize((image_width, image_height), Image.ANTIALIAS)
     tkImage = ImageTk.PhotoImage(image=pilImage)
+    # tkImage = ImageTk.PhotoImage(image=Image.fromarray(pilImage))
     return tkImage
 
 
