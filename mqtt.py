@@ -14,7 +14,6 @@ class UCMqtt(object):
     connected_flag = False
     bad_connection_flag = False
     disconnect_flag = False
-    turnoff_flag = False
 
     def __init__(self):
         self.client = mqtt.Client(self.ID)
@@ -43,7 +42,7 @@ class UCMqtt(object):
             print(err)
 
     def on_disconnect(self, client, userdata, rc):
-        print("disconnecting reason: {0}".format)
+        print("MQTTClient: disconnect reason: {0}".format)
         self.connected_flag = False
         self.disconnect_flag = True
         self.client.loop_stop()
@@ -61,9 +60,12 @@ class UCMqtt(object):
         """
         if rc == 0:
             self.connected_flag = True
-            print("Connection established successfuly with result code " + str(rc))
+            print(
+                "MQTTClient: Connection established successfuly with result code "
+                + str(rc)
+            )
         else:
-            print("Connection establish ERROR with result code " + str(rc))
+            print("MQTTClient: Connection establish ERROR with result code " + str(rc))
             self.bad_connection_flag = True
 
     def on_subscribe(self, client, userdata, mid, granted_qos):
@@ -75,10 +77,7 @@ class UCMqtt(object):
         handle the message when a PUBLISH message is received from the server
         handlers should not set blocked
         """
-        # print(message.payload)
         print("Time on receive={0}".format(time.asctime(time.localtime(time.time()))))
-        if message == "off":
-            self.turnoff_flag = True
         print(
             "Received={0}\nTopic={1}\nQOS={2}\nRetain Flag={3}".format(
                 message.payload.decode("utf-8"),
