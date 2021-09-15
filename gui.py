@@ -1,3 +1,4 @@
+import configparser
 import time
 import tkinter as tk
 from gettext import gettext as _
@@ -6,6 +7,13 @@ from tkinter.ttk import Notebook, PanedWindow
 
 import cv2
 from PIL import Image, ImageTk
+
+configFile = "config.ini"
+cfg = configparser.ConfigParser(comment_prefixes="#")  # 创建配置文件对象
+cfg.read(configFile, encoding="utf-8")  # 读取配置文件，没有就创建
+if not cfg.has_section("TKINTER"):
+    cfg.add_section("TKINTER")  # 没有就创建
+
 
 # 整体布局
 root = tk.Tk()
@@ -70,6 +78,8 @@ btn_snap.pack(side="bottom")
 # 右面板的 LED 标签页
 labColor = tk.Label(fLed, text=_("Color Preview"), height=5, width=20)  # 颜色预览标签
 labColor.pack()
+if cfg.has_option("TKINTER", "ledColor"):
+    labColor["bg"] = cfg.get("TKINTER", "ledColor")
 
 
 def ChooseColor():
@@ -79,6 +89,9 @@ def ChooseColor():
     if r:  # 避免选择 cancel 将 NULL 赋值给 颜色预览标签
         global labColor
         labColor["bg"] = r[1]
+        cfg.set("TKINTER", "ledColor", r[1])
+        with open(configFile, "w", encoding="utf-8") as configfile:  # 保存颜色配置
+            cfg.write(configfile)
 
 
 btnColor = tk.Button(fLed, text=_("Choose Color"), command=ChooseColor)

@@ -28,4 +28,6 @@ ImportError: libtk8.6.so: cannot open shared object file: No such file or direct
 - [python Tkinter Display images on canvas, it always blink](https://stackoverflow.com/questions/20307718/python-tkinter-display-images-on-canvas-it-always-blink):用 canvas 闪烁的解决办法就是不用它，用 label 就没有这个问题
 - [opencv-python-learn](https://gitee.com/anidea/opencv-python-learn):video/camera.py
 - [用Python和摄像头制作简单的延时摄影. 達聞西.2015-03-25](https://www.cnblogs.com/frombeijingwithlove/p/4366605.html)
+- [Python利用configparser对配置文件进行读写详解。Kearney form An idea 2020-10-20](https://blog.csdn.net/weixin_43031092/article/details/109174379)
+- []()
 - []()
