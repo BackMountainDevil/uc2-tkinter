@@ -1,7 +1,6 @@
 from gettext import gettext as _
 import tkinter as tk
 from tkinter import colorchooser
-from tkinter import messagebox
 import cv2
 from PIL import Image, ImageTk  # 图像控件
 import time
@@ -14,20 +13,10 @@ root.geometry("640x480")  # 设置窗口的大小
 m1 = tk.PanedWindow(root, showhandle=True, sashrelief="raised")  # 默认是左右分布的
 m1.pack(fill=tk.BOTH, expand=1)
 
-left = tk.Label(m1, text="CAMERA", bg="blue")
-m1.add(left)
-
-
-m2 = tk.PanedWindow(orient=tk.VERTICAL, showhandle=True, sashrelief="raised")
-m1.add(m2)
-
-root = tk.Label(m2, text="标签2", bg="green")
-m2.add(root)
-
-bottom = tk.Label(m2, text="标签3", bg="red")
-m2.add(bottom)
 
 cap = cv2.VideoCapture(0)  # 创建摄像头对象
+
+
 # 界面画布更新图像
 def tkImage():
     ref, frame = cap.read()
@@ -40,22 +29,26 @@ def tkImage():
     return tkImage
 
 
-image_width = 600
-image_height = 500
-canvas = tk.Canvas(m1, bg="white", width=image_width, height=image_height)  # 绘制画布
-canvas.place(x=0, y=0)
+image_width = 300
+image_height = 200
+canvas = tk.Canvas(m1, bg="white", width=image_width, height=image_height)
+# canvas.pack(side="top")
+m1.add(canvas)
 
 
 def ImageSave():
     timestr = time.strftime("%Y%m%d_%H%M%S")
-    filename = "image/{}.png".format(timestr)
+    filename = "{}.png".format(timestr)
     ref, frame = cap.read()
     frame = cv2.flip(frame, 1)  # 摄像头翻转
     cv2.imwrite(filename, frame)
 
 
 btn_snap = tk.Button(m1, text=_("SNAP"), width=5, height=2, command=ImageSave)
-btn_snap.pack()
+btn_snap.pack(side="bottom")
+
+m2 = tk.PanedWindow(orient=tk.VERTICAL, showhandle=True, sashrelief="raised")
+m1.add(m2)
 
 
 def motorchange():
@@ -74,25 +67,47 @@ sb1 = tk.Spinbox(
 sb1.pack()
 
 
-def click_button():
+def MotroMove():
     """
-    当按钮被点击时执行该函数
+    获取 slidebar 的值，向舵机发送 mqtt 指令
     """
-    messagebox.showinfo(title=_("友情提示"), message=_("你点击了按钮"))
+    print("value: ", motorvalue.get())
 
 
-btn_motor = tk.Button(m2, text=_("MOVE"), width=5, height=2, command=click_button)
+btn_motor = tk.Button(m2, text=_("MOVE"), width=5, height=2, command=MotroMove)
 btn_motor.pack()
+
+LedColor = (255, 255, 255)
 
 
 def ChooseColor():
-    r = tk.colorchooser.askcolor(title=_("颜色选择器"))
-    print(r)
+    r = colorchooser.askcolor(title=_("颜色选择器"))
+    print(r, r[0])
+    # ((239, 240, 241), '#eff0f1')
+    if r[0]:  # 避免选择 cancel 将 NULL 赋值给 LedColor
+        global LedColor
+        LedColor = r[0]
 
 
 button1 = tk.Button(m2, text=_("Choose Color"), command=ChooseColor)
 button1.pack()
 
+
+def LedOn():
+    """获取颜色，并发送 mqtt 开灯指令"""
+    print("LedOn, color: ", LedColor)
+
+
+def LedOff():
+    """发送 mqtt 关灯指令"""
+    print("LedOff")
+    pass
+
+
+btnLedOn = tk.Button(m2, text=_("LedOn"), command=LedOn)
+btnLedOff = tk.Button(m2, text=_("LedOFF"), command=LedOff)
+btnLedOn.pack()
+btnLedOff.pack()
 
 while True:
     pic = tkImage()
