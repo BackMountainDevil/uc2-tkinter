@@ -1,86 +1,72 @@
-from gettext import gettext as _
-import tkinter as tk
-from tkinter import colorchooser
-import cv2
-from PIL import Image, ImageTk  # 图像控件
 import time
+import tkinter as tk
+from gettext import gettext as _
+from tkinter import colorchooser
+from tkinter.ttk import Notebook, PanedWindow
 
+import cv2
+from PIL import Image, ImageTk
+
+# 整体布局
 root = tk.Tk()
-
-root.title(_("第一个窗口"))  # 设置窗口的标题
+root.title(_("UC2"))  # 设置窗口的标题
 root.geometry("640x480")  # 设置窗口的大小
 
-m1 = tk.PanedWindow(root, showhandle=True, sashrelief="raised")  # 默认是左右分布的
-m1.pack(fill=tk.BOTH, expand=1)
+pw = PanedWindow(orient=tk.HORIZONTAL)
+pw.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+# 左右两块区域
+lfCam = tk.LabelFrame(pw, text=_("Camera"), width=320)
+pw.add(lfCam, weight=2)
+lfControl = tk.LabelFrame(pw, text=_("Control"), width=320)
+pw.add(lfControl, weight=2)
+
+# 右面版分为两个标签页
+nb = Notebook(lfControl)
+fLed = tk.Frame()
+fMotor = tk.Frame()
+nb.add(fLed, text=_("LED"))
+nb.add(fMotor, text=_("Motor"))
+nb.pack(padx=5, pady=5, fill=tk.BOTH, expand=True)
+
+# 左面版
 
 
-cap = cv2.VideoCapture(0)  # 创建摄像头对象
-
-
-# 界面画布更新图像
-def tkImage():
-    ref, frame = cap.read()
-    frame = cv2.flip(frame, 1)  # 摄像头翻转
+def TkImage():
+    """获取摄像头画面，返回 pil 格式的图像"""
+    ref, frame = Cap.read()
+    frame = cv2.flip(frame, 1)
     cvimage = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
     pilImage = Image.fromarray(cvimage)
-    pilImage = pilImage.resize((image_width, image_height), Image.ANTIALIAS)
+    pilImage = pilImage.resize((imgWidth, imgHeight), Image.ANTIALIAS)
     tkImage = ImageTk.PhotoImage(image=pilImage)
-    # tkImage = ImageTk.PhotoImage(image=Image.fromarray(pilImage))
     return tkImage
 
 
-image_width = 300
-image_height = 200
-canvas = tk.Canvas(m1, bg="white", width=image_width, height=image_height)
-# canvas.pack(side="top")
-m1.add(canvas)
-
-
 def ImageSave():
+    """将摄像头画面保存为 拍摄时间.jpg 文件"""
     timestr = time.strftime("%Y%m%d_%H%M%S")
-    filename = "{}.png".format(timestr)
-    ref, frame = cap.read()
-    frame = cv2.flip(frame, 1)  # 摄像头翻转
+    filename = "{}.jpg".format(timestr)
+    ref, frame = Cap.read()
+    frame = cv2.flip(frame, 1)
     cv2.imwrite(filename, frame)
 
 
-btn_snap = tk.Button(m1, text=_("SNAP"), width=5, height=2, command=ImageSave)
+Cap = cv2.VideoCapture(0)  # 创建摄像头对象
+
+imgWidth = 300
+imgHeight = 200
+canvas = tk.Canvas(lfCam, bg="white", width=imgWidth, height=imgHeight)
+canvas.pack()
+btn_snap = tk.Button(lfCam, text=_("SNAP"), width=5, height=2, command=ImageSave)
 btn_snap.pack(side="bottom")
 
-m2 = tk.PanedWindow(orient=tk.VERTICAL, showhandle=True, sashrelief="raised")
-m1.add(m2)
-
-
-def motorchange():
-    print(motorvalue.get())
-
-
-motorvalue = tk.IntVar()
-sb1 = tk.Spinbox(
-    m2,
-    from_=0,  # 最小值0
-    to=100,  # 最大值100
-    increment=10,  # 点击一次变化幅度为5
-    textvariable=motorvalue,  # 绑定变量
-    command=motorchange,
-)
-sb1.pack()
-
-
-def MotroMove():
-    """
-    获取 slidebar 的值，向舵机发送 mqtt 指令
-    """
-    print("value: ", motorvalue.get())
-
-
-btn_motor = tk.Button(m2, text=_("MOVE"), width=5, height=2, command=MotroMove)
-btn_motor.pack()
-
+# 右面板的 LED 标签页
 LedColor = (255, 255, 255)
 
 
 def ChooseColor():
+    """设置颜色，但先不使设置生效，需要 LedOn 使其生效，避免失误"""
     r = colorchooser.askcolor(title=_("颜色选择器"))
     print(r, r[0])
     # ((239, 240, 241), '#eff0f1')
@@ -89,32 +75,61 @@ def ChooseColor():
         LedColor = r[0]
 
 
-button1 = tk.Button(m2, text=_("Choose Color"), command=ChooseColor)
-button1.pack()
+butColor = tk.Button(fLed, text=_("Choose Color"), command=ChooseColor)
+butColor.pack()
 
 
 def LedOn():
-    """获取颜色，并发送 mqtt 开灯指令"""
+    """将颜色设置发送 mqtt 开灯指令"""
     print("LedOn, color: ", LedColor)
 
 
 def LedOff():
     """发送 mqtt 关灯指令"""
     print("LedOff")
-    pass
 
 
-btnLedOn = tk.Button(m2, text=_("LedOn"), command=LedOn)
-btnLedOff = tk.Button(m2, text=_("LedOFF"), command=LedOff)
+btnLedOn = tk.Button(fLed, text=_("LedOn"), command=LedOn)
+btnLedOff = tk.Button(fLed, text=_("LedOFF"), command=LedOff)
 btnLedOn.pack()
 btnLedOff.pack()
 
-while True:
-    pic = tkImage()
-    canvas.create_image(0, 0, anchor="nw", image=pic)
-    m1.update()
-    m1.after(100)
-cap.release()
-print("loop")
+# 右面板的 Motor 标签页
 
-root.mainloop()  # 启动窗口
+
+def MotorChange():
+    print(motorValue.get())
+
+
+def MotroMove():
+    """
+    获取 slidebar 的值，向舵机发送 mqtt 指令
+    """
+    print("value: ", motorValue.get())
+
+
+motorValue = tk.IntVar()
+sbMotor = tk.Spinbox(
+    fMotor,
+    from_=0,  # 最小值0
+    to=100,  # 最大值100
+    increment=10,  # 点击一次变化幅度为5
+    textvariable=motorValue,  # 绑定变量
+    command=MotorChange,
+)
+sbMotor.pack()
+btnMotor = tk.Button(fMotor, text=_("MOVE"), width=5, height=2, command=MotroMove)
+btnMotor.pack()
+
+# 摄像头画面更新
+
+while True:
+    pic = TkImage()
+    canvas.create_image(0, 0, anchor="nw", image=pic)
+    lfCam.update()
+    lfCam.after(100)
+
+root.mainloop()
+Cap.release()
+cv2.destroyAllWindows()
+print(_("app close"))
