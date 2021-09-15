@@ -68,26 +68,26 @@ btn_snap = tk.Button(lfCam, text=_("SNAP"), width=5, height=2, command=ImageSave
 btn_snap.pack(side="bottom")
 
 # 右面板的 LED 标签页
-LedColor = (255, 255, 255)
+labColor = tk.Label(fLed, text=_("Color Preview"), height=5, width=20)  # 颜色预览标签
+labColor.pack()
 
 
 def ChooseColor():
     """设置颜色，但先不使设置生效，需要 LedOn 使其生效，避免失误"""
     r = colorchooser.askcolor(title=_("颜色选择器"))
-    print(r, r[0])
     # ((239, 240, 241), '#eff0f1')
-    if r[0]:  # 避免选择 cancel 将 NULL 赋值给 LedColor
-        global LedColor
-        LedColor = r[0]
+    if r:  # 避免选择 cancel 将 NULL 赋值给 颜色预览标签
+        global labColor
+        labColor["bg"] = r[1]
 
 
-butColor = tk.Button(fLed, text=_("Choose Color"), command=ChooseColor)
-butColor.pack()
+btnColor = tk.Button(fLed, text=_("Choose Color"), command=ChooseColor)
+btnColor.pack()
 
 
 def LedOn():
     """将颜色设置发送 mqtt 开灯指令"""
-    print("LedOn, color: ", LedColor)
+    print("LedOn, color: ", labColor.cget("bg"))
 
 
 def LedOff():
