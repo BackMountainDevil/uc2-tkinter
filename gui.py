@@ -33,7 +33,8 @@ nb.pack(padx=5, pady=5, fill=tk.BOTH, expand=True)
 
 
 def ShowImg():
-    """获取摄像头画面，并显示在画布上"""
+    """获取摄像头画面，并显示在 label 上"""
+    global CamCanvas
     ret, frame = Cap.read()  # 一帧一帧获取画面
     if not ret:
         print(_("Can't receive frame (stream end?). Exiting ..."))
@@ -43,9 +44,9 @@ def ShowImg():
         pilImage = Image.fromarray(cvimage)
         pilImage = pilImage.resize((imgWidth, imgHeight), Image.ANTIALIAS)
         tkImage = ImageTk.PhotoImage(image=pilImage)
-        CamCanvas.create_image(0, 0, anchor="nw", image=tkImage)
-        CamCanvas.update()  # 强制重绘画布
-        lfCam.after(10, ShowImg)  # 定时器，间隔 10 ms
+        CamCanvas.imgtk = tkImage
+        CamCanvas.config(image=tkImage)
+        CamCanvas.after(10, ShowImg)  # 定时器，间隔 10 ms
 
 
 def ImageSave():
@@ -61,7 +62,7 @@ Cap = cv2.VideoCapture(0)  # 创建摄像头对象
 
 imgWidth = 300
 imgHeight = 200
-CamCanvas = tk.Canvas(lfCam, bg="white", width=imgWidth, height=imgHeight)
+CamCanvas = tk.Label(lfCam, bg="white", width=imgWidth, height=imgHeight)
 CamCanvas.pack()
 btn_snap = tk.Button(lfCam, text=_("SNAP"), width=5, height=2, command=ImageSave)
 btn_snap.pack(side="bottom")
