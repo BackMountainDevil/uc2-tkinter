@@ -4,6 +4,7 @@ from tkinter import colorchooser
 from tkinter import messagebox
 import cv2
 from PIL import Image, ImageTk  # 图像控件
+import time
 
 root = tk.Tk()
 
@@ -43,6 +44,18 @@ image_width = 600
 image_height = 500
 canvas = tk.Canvas(m1, bg="white", width=image_width, height=image_height)  # 绘制画布
 canvas.place(x=0, y=0)
+
+
+def ImageSave():
+    timestr = time.strftime("%Y%m%d_%H%M%S")
+    filename = "image/{}.png".format(timestr)
+    ref, frame = cap.read()
+    frame = cv2.flip(frame, 1)  # 摄像头翻转
+    cv2.imwrite(filename, frame)
+
+
+btn_snap = tk.Button(m1, text=_("SNAP"), width=5, height=2, command=ImageSave)
+btn_snap.pack()
 
 
 def motorchange():
