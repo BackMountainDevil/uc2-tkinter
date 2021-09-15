@@ -21,10 +21,10 @@ ImportError: libtk8.6.so: cannot open shared object file: No such file or direct
 
 根据 [tkdocs install](https://tkdocs.com/tutorial/install.html#installlinux) 中对 linux 发行版的介绍，应该是可以在包管理器中找到这个包的，如 `sudo apt-get install python3-tk`，在 Arch 系列中，可以通过 `sudo pacman -S tk` 来安装 [tk](https://bbs.archlinux.org/viewtopic.php?id=260449)，此时再通过 `python -m tkinter` 测试就会出现一个窗体程序了。
 
+# 参考
 
 - [Python GUI之tkinter教程](http://www.coolpython.net/tk/tk_primary/index.html)
-- [Python调用摄像头，实时显示视频在Tkinter界面.lyx4949. 2021-05-20](https://blog.csdn.net/lyx4949/article/details/117086277)
-- [AttributeError: 'PhotoImage' object has no attribute '_PhotoImage__photo'](https://stackoverflow.com/questions/50662773/attributeerror-photoimage-object-has-no-attribute-photoimage-photo):在终端中运行推出后报错，但是代码中已使用 pil 格式的图像，尚不明所以
-- [RuntimeError: Too early to create image [duplicate]](https://stackoverflow.com/questions/53861528/runtimeerror-too-early-to-create-image)：按 F5 使用 vscode 的 python 扩展调试推出后报这个错误，尚未解决。上面的错误这个调试方式下却不会出现，这个错误也不会上面出现。。
-- []()
+- [UPython+opencv+tkinter整合demo完成！荣轩浩 2018-04-17](https://blog.csdn.net/a1_a1_a/article/details/79981788)
+- [opencv-python-learn](https://gitee.com/anidea/opencv-python-learn):video/camera.py
+- [用Python和摄像头制作简单的延时摄影. 達聞西.2015-03-25](https://www.cnblogs.com/frombeijingwithlove/p/4366605.html)
 - []()

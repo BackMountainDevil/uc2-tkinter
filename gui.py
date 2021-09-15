@@ -32,15 +32,20 @@ nb.pack(padx=5, pady=5, fill=tk.BOTH, expand=True)
 # 左面版
 
 
-def TkImage():
-    """获取摄像头画面，返回 pil 格式的图像"""
-    ref, frame = Cap.read()
-    frame = cv2.flip(frame, 1)
-    cvimage = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
-    pilImage = Image.fromarray(cvimage)
-    pilImage = pilImage.resize((imgWidth, imgHeight), Image.ANTIALIAS)
-    tkImage = ImageTk.PhotoImage(image=pilImage)
-    return tkImage
+def ShowImg():
+    """获取摄像头画面，并显示在画布上"""
+    ret, frame = Cap.read()  # 一帧一帧获取画面
+    if not ret:
+        print(_("Can't receive frame (stream end?). Exiting ..."))
+    else:
+        frame = cv2.flip(frame, 1)
+        cvimage = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
+        pilImage = Image.fromarray(cvimage)
+        pilImage = pilImage.resize((imgWidth, imgHeight), Image.ANTIALIAS)
+        tkImage = ImageTk.PhotoImage(image=pilImage)
+        CamCanvas.create_image(0, 0, anchor="nw", image=tkImage)
+        CamCanvas.update()  # 强制重绘画布
+        lfCam.after(10, ShowImg)  # 定时器，间隔 10 ms
 
 
 def ImageSave():
@@ -56,8 +61,8 @@ Cap = cv2.VideoCapture(0)  # 创建摄像头对象
 
 imgWidth = 300
 imgHeight = 200
-canvas = tk.Canvas(lfCam, bg="white", width=imgWidth, height=imgHeight)
-canvas.pack()
+CamCanvas = tk.Canvas(lfCam, bg="white", width=imgWidth, height=imgHeight)
+CamCanvas.pack()
 btn_snap = tk.Button(lfCam, text=_("SNAP"), width=5, height=2, command=ImageSave)
 btn_snap.pack(side="bottom")
 
@@ -121,14 +126,8 @@ sbMotor.pack()
 btnMotor = tk.Button(fMotor, text=_("MOVE"), width=5, height=2, command=MotroMove)
 btnMotor.pack()
 
-# 摄像头画面更新
 
-while True:
-    pic = TkImage()
-    canvas.create_image(0, 0, anchor="nw", image=pic)
-    lfCam.update()
-    lfCam.after(100)
-
+ShowImg()
 root.mainloop()
 Cap.release()
 cv2.destroyAllWindows()
