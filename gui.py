@@ -1,4 +1,5 @@
 import configparser
+import os
 import time
 import tkinter as tk
 from gettext import gettext as _
@@ -72,20 +73,19 @@ def ImageSave():
 
 def VideoRecord():
     """将画面录制成视频"""
-    global timeGap, Cap, isRecord, isSave, CapFile
+    global timeGap, Cap, isRecord, isSave, CapFile, CapDir, CapDirName
     ret, frame = Cap.read()  # 一帧一帧获取画面
     if isRecord:
         if ret:
             frame = cv2.flip(frame, 1)
             timestr = time.strftime("%Y%m%d_%H%M%S")
             filename = "{}.jpg".format(timestr)
-            cv2.imwrite(filename, frame)  # 保存图片，以防断电
+            filepath = os.path.join(os.getcwd(), CapDir, CapDirName)
+            cv2.imwrite(os.path.join(filepath, filename), frame)  # 保存图片，以防断电
             CapFile.write(frame)  # 将画面写入视频文件
 
         else:
             print("Can't receive frame (stream end?)")
-    else:
-        pass
     delayTime = timeGap.get()  # 单位：秒
     if delayTime < 3:  # 0 会运行异常
         delayTime = 3
@@ -95,7 +95,7 @@ def VideoRecord():
 
 def isVideoRecord():
     """开始录制或者暂停录制"""
-    global Cap, timeGap, isRecord, CapFile, btnRecord
+    global Cap, CapFile, CapDir, isRecord, timeGap, btnRecord, CapDirName
     FPS = 25  # 生成视频的帧率
     FRAME_WIDTH = int(Cap.get(cv2.CAP_PROP_FRAME_WIDTH))  # 获取相机帧的宽高
     FRAME_HEIGHT = int(Cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -104,9 +104,17 @@ def isVideoRecord():
         isRecord = not isRecord
         btnRecord["text"] = _("Stop Record")
         btnRecord["bg"] = "red"
-        timestr = time.strftime("%Y%m%d_%H%M%S_")
-        filename = "{}{}.avi".format(timestr, timeGap.get())  # 文件名
-        CapFile = cv2.VideoWriter(filename, FORMAT, FPS, (FRAME_WIDTH, FRAME_HEIGHT))
+        timestr = time.strftime("%Y%m%d_%H%M%S")
+        filename = "{}_{}.avi".format(timestr, timeGap.get())  # 文件名:时间_间隔时间.avi
+        CapDirName = "{}_{}".format(timestr, timeGap.get())
+        filepath = os.path.join(os.getcwd(), CapDir, CapDirName)
+        if not os.path.exists(filepath):  # 文件路径检测
+            os.makedirs(filepath)
+        filefullpath = os.path.join(filepath, filename)
+        print(_("Start record to file: "), filefullpath)
+        CapFile = cv2.VideoWriter(
+            filefullpath, FORMAT, FPS, (FRAME_WIDTH, FRAME_HEIGHT)
+        )
     else:
         isRecord = False  # 暂停录制
         btnRecord["text"] = _("Start Record")
@@ -116,6 +124,12 @@ def isVideoRecord():
 
 Cap = cv2.VideoCapture(0)  # 创建摄像头对象
 CapFile = None  # 视频文件
+CapDir = ""  # 视频（图像）文件的一级目录，可在配置文件中自定义
+if cfg.has_option("TKINTER", "CapDir"):
+    CapDir = cfg.get("TKINTER", "CapDir")
+else:
+    CapDir = "output"  # 默认值
+CapDirName = ""  # 视频（图像）文件的二级目录,程序自动创建：时间_间隔时间
 isRecord = False  # 暂停录制
 
 

@@ -113,3 +113,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# 默认的视频（图像）文件输出目录
+output/
