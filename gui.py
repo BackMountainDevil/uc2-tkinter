@@ -116,10 +116,6 @@ btnLedOff.pack()
 # 右面板的 Motor 标签页
 
 
-def MotorChange():
-    print(motorValue.get())
-
-
 def MotroMove():
     """
     获取 slidebar 的值，向舵机发送 mqtt 指令
@@ -130,11 +126,10 @@ def MotroMove():
 motorValue = tk.IntVar()
 sbMotor = tk.Spinbox(
     fMotor,
-    from_=0,  # 最小值0
-    to=100,  # 最大值100
-    increment=10,  # 点击一次变化幅度为5
+    from_=-1000,  # 最小值
+    to=1000,  # 最大值
+    increment=10,  # 点击一次变化幅度为 10
     textvariable=motorValue,  # 绑定变量
-    command=MotorChange,
 )
 sbMotor.pack()
 btnMotor = tk.Button(fMotor, text=_("MOVE"), width=5, height=2, command=MotroMove)
