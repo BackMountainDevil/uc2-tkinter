@@ -88,5 +88,6 @@ mosquitto_pub -t /S007/LAR01/RECM -m "PXL+2+127+255+50"
 - [opencv-python-learn](https://gitee.com/anidea/opencv-python-learn):video/camera.py
 - [用Python和摄像头制作简单的延时摄影. 達聞西.2015-03-25](https://www.cnblogs.com/frombeijingwithlove/p/4366605.html)
 - [Python利用configparser对配置文件进行读写详解。Kearney form An idea 2020-10-20](https://blog.csdn.net/weixin_43031092/article/details/109174379)
-- []()
+- [python+opencv 将视频保存成 gif 动图. 一豆豆酱 2020-07-31](https://blog.csdn.net/qq_44965314/article/details/107706145)
+- [opencv+tkinter录像程序.蓝色的程序猿 2020-11-20](https://blog.csdn.net/weixin_45906794/article/details/109876455)
 - []()

@@ -45,10 +45,10 @@ nb.pack(padx=5, pady=5, fill=tk.BOTH, expand=True)
 
 def ShowImg():
     """获取摄像头画面，并显示在 label 上"""
-    global labCam
+    global labCam, Cap
     ret, frame = Cap.read()  # 一帧一帧获取画面
     if not ret:
-        print(_("Can't receive frame (stream end?). Exiting ..."))
+        print(_("Can't receive frame (stream end?)"))
     else:
         frame = cv2.flip(frame, 1)
         cvimage = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
@@ -57,11 +57,12 @@ def ShowImg():
         tkImage = ImageTk.PhotoImage(image=pilImage)
         labCam.imgtk = tkImage
         labCam.config(image=tkImage)
-        labCam.after(10, ShowImg)  # 定时器，间隔 10 ms
+        labCam.after(100, ShowImg)  # 定时器，间隔 100 ms 后调用自身
 
 
 def ImageSave():
     """将摄像头画面保存为 拍摄时间.jpg 文件"""
+    global Cap
     timestr = time.strftime("%Y%m%d_%H%M%S")
     filename = "{}.jpg".format(timestr)
     ref, frame = Cap.read()
@@ -69,15 +70,81 @@ def ImageSave():
     cv2.imwrite(filename, frame)
 
 
+def VideoRecord():
+    """将画面录制成视频"""
+    global timeGap, Cap, isRecord, isSave, CapFile
+    ret, frame = Cap.read()  # 一帧一帧获取画面
+    if isRecord:
+        if ret:
+            frame = cv2.flip(frame, 1)
+            timestr = time.strftime("%Y%m%d_%H%M%S")
+            filename = "{}.jpg".format(timestr)
+            cv2.imwrite(filename, frame)  # 保存图片，以防断电
+            CapFile.write(frame)  # 将画面写入视频文件
+
+        else:
+            print("Can't receive frame (stream end?)")
+    else:
+        pass
+    delayTime = timeGap.get()  # 单位：秒
+    if delayTime < 3:  # 0 会运行异常
+        delayTime = 3
+        print(_("Warning: Time is less than 3! It will be set to 3"))
+    labCam.after(1000 * delayTime, VideoRecord)  # 定时器，间隔 xx ms 后调用自身，注意单位
+
+
+def isVideoRecord():
+    """开始录制或者暂停录制"""
+    global Cap, timeGap, isRecord, CapFile, btnRecord
+    FPS = 25  # 生成视频的帧率
+    FRAME_WIDTH = int(Cap.get(cv2.CAP_PROP_FRAME_WIDTH))  # 获取相机帧的宽高
+    FRAME_HEIGHT = int(Cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    FORMAT = cv2.VideoWriter_fourcc(*"XVID")  # 固定的文件格式
+    if not isRecord:
+        isRecord = not isRecord
+        btnRecord["text"] = _("Stop Record")
+        btnRecord["bg"] = "red"
+        timestr = time.strftime("%Y%m%d_%H%M%S_")
+        filename = "{}{}.avi".format(timestr, timeGap.get())  # 文件名
+        CapFile = cv2.VideoWriter(filename, FORMAT, FPS, (FRAME_WIDTH, FRAME_HEIGHT))
+    else:
+        isRecord = False  # 暂停录制
+        btnRecord["text"] = _("Start Record")
+        btnRecord["bg"] = "#eff0f1"
+        CapFile = None
+
+
 Cap = cv2.VideoCapture(0)  # 创建摄像头对象
+CapFile = None  # 视频文件
+isRecord = False  # 暂停录制
+
 
 imgWidth = 300
 imgHeight = 200
 labCam = tk.Label(lfCam, bg="white", width=imgWidth, height=imgHeight)
-labCam.pack()
-btn_snap = tk.Button(lfCam, text=_("SNAP"), width=5, height=2, command=ImageSave)
-btn_snap.pack(side="bottom")
+labCam.grid(row=0, column=0, rowspan=1, columnspan=3)  # 占据三个格子
 
+labTime = tk.Label(lfCam, text=_("Time(s)"))  # 时间标签
+labTime.grid(row=1, column=0, padx=5, pady=5)
+
+timeGap = tk.IntVar()  # 时间间隔
+sbTime = tk.Spinbox(
+    lfCam,
+    from_=0,  # 最小值
+    to=1000,  # 最大值
+    increment=1,  # 点击一次变化幅度为 1
+    textvariable=timeGap,
+    width=10,
+)
+sbTime.grid(row=1, column=2, padx=5, pady=5)
+
+btn_snap = tk.Button(lfCam, text=_("SNAP"), width=5, height=2, command=ImageSave)
+btn_snap.grid(row=2, column=0)
+
+btnRecord = tk.Button(
+    lfCam, text=_("Start Record"), width=10, height=2, command=isVideoRecord
+)
+btnRecord.grid(row=2, column=1, columnspan=2)
 # 右面板的 LED 标签页
 labColor = tk.Label(fLed, text=_("Color Preview"), height=5, width=20)  # 颜色预览标签
 labColor.pack()
@@ -149,7 +216,9 @@ btnMotor.pack()
 mqclient = UCMqtt()  # 创建 mqtt 对象实例
 mqclient.connect()  # 连接 broker
 
+
 ShowImg()
+VideoRecord()  # 录制事件
 root.mainloop()
 Cap.release()
 cv2.destroyAllWindows()
