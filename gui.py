@@ -169,8 +169,8 @@ btnRecord = tk.Button(
 )
 btnRecord.grid(row=2, column=1, columnspan=2)
 # 右面板的 LED 标签页
-labColor = tk.Label(fLed, text=_("Color Preview"), height=5, width=20)  # 颜色预览标签
-labColor.pack()
+labColor = tk.Label(fLed, text=_("Color Preview"), height=5, width=25)  # 颜色预览标签
+labColor.grid(row=0, column=0, columnspan=2)
 if cfg.has_option("TKINTER", "ledColor"):
     labColor["bg"] = cfg.get("TKINTER", "ledColor")
 
@@ -188,7 +188,7 @@ def ChooseColor():
 
 
 btnColor = tk.Button(fLed, text=_("Choose Color"), command=ChooseColor)
-btnColor.pack()
+btnColor.grid(row=1, column=0, columnspan=2)
 
 
 def LedOn():
@@ -205,8 +205,8 @@ def LedOff():
 
 btnLedOn = tk.Button(fLed, text=_("LedOn"), command=LedOn)
 btnLedOff = tk.Button(fLed, text=_("LedOFF"), command=LedOff)
-btnLedOn.pack()
-btnLedOff.pack()
+btnLedOn.grid(row=2, column=0)
+btnLedOff.grid(row=2, column=1)
 
 # 右面板的 Motor 标签页
 
@@ -232,9 +232,10 @@ sbMotor = tk.Spinbox(
     increment=10,  # 点击一次变化幅度为 10
     textvariable=motorValue,  # 绑定变量
 )
-sbMotor.pack()
-btnMotor = tk.Button(fMotor, text=_("MOVE"), width=5, height=2, command=MotroMove)
-btnMotor.pack()
+sbMotor.grid(row=0, column=0, columnspan=2)
+btnMotor = tk.Button(fMotor, text=_("MOVE"), width=25, height=2, command=MotroMove)
+btnMotor.grid(row=1, column=0, columnspan=2)
+
 
 mqclient = UCMqtt()  # 创建 mqtt 对象实例
 mqclient.connect()  # 连接 broker
