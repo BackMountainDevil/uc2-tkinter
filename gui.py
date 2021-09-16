@@ -8,8 +8,8 @@ from tkinter.ttk import Notebook, PanedWindow
 import cv2
 from PIL import Image, ImageTk
 
-from util import Hex2Rgb
 from mqtt import UCMqtt
+from util import Hex2Rgb
 
 configFile = "config.ini"
 cfg = configparser.ConfigParser(comment_prefixes="#")  # 创建配置文件对象
@@ -103,12 +103,14 @@ btnColor.pack()
 
 def LedOn():
     """将颜色设置发送 mqtt 开灯指令"""
-    print("LedOn, color: ", labColor.cget("bg"), Hex2Rgb(labColor.cget("bg")))
+    global labColor, mqclient
+    mqclient.publish("/S007/LAR01/RECM", "RECT+0+0+8+8+" + Hex2Rgb(labColor.cget("bg")))
 
 
 def LedOff():
     """发送 mqtt 关灯指令"""
-    print("LedOff")
+    global mqclient
+    mqclient.publish("/S007/LAR01/RECM", "CLEAR")
 
 
 btnLedOn = tk.Button(fLed, text=_("LedOn"), command=LedOn)

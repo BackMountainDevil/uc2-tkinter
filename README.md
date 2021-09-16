@@ -25,6 +25,31 @@ ImportError: libtk8.6.so: cannot open shared object file: No such file or direct
 
 /UC2-Software-GIT/HARDWARE_CONTROL/ESP32/README.md
 
+## 安装 mosquitto 
+sudo pacman -S mosquitto
+sudo apt-get install mosquitto mosquitto-clients
+
+```bash
+# 测试启动，使用默认配置 1883 端口
+mosquitto
+
+客户端，模拟订阅
+mosquitto_sub -v -t topic01
+// motor
+mosquitto_sub -v -t /S007/MOT01/STAT
+mosquitto_sub -v -t /S007/MOT01/RECM
+// led
+mosquitto_sub -v -t /S007/LAR01/STAT
+mosquitto_sub -v -t /S007/LAR01/RECM
+mosquitto_sub -v -t /S007/LAR01/ANNO
+
+一个客户端，模拟发布
+mosquitto_pub -t topic01 -m hello
+mosquitto_pub -t /S007/MOT01/RECM -m "DRVZ+1000"
+
+mosquitto_pub -t /S007/LAR01/RECM -m "PXL+2+127+255+50"
+```
+
 ## LED
 
 |COMMAND|RANGE|EXAMPLE|
