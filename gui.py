@@ -9,6 +9,7 @@ import cv2
 from PIL import Image, ImageTk
 
 from util import Hex2Rgb
+from mqtt import UCMqtt
 
 configFile = "config.ini"
 cfg = configparser.ConfigParser(comment_prefixes="#")  # 创建配置文件对象
@@ -122,7 +123,13 @@ def MotroMove():
     """
     获取 slidebar 的值，向舵机发送 mqtt 指令
     """
-    print("value: ", motorValue.get())
+    global motorValue, mqclient
+    value = motorValue.get()
+    if value < 0:
+        cmd = "DRVZ" + str(motorValue.get())
+    else:
+        cmd = "DRVZ+" + str(motorValue.get())
+    mqclient.publish("/S007/MOT01/RECM", cmd)
 
 
 motorValue = tk.IntVar()
@@ -137,6 +144,8 @@ sbMotor.pack()
 btnMotor = tk.Button(fMotor, text=_("MOVE"), width=5, height=2, command=MotroMove)
 btnMotor.pack()
 
+mqclient = UCMqtt()  # 创建 mqtt 对象实例
+mqclient.connect()  # 连接 broker
 
 ShowImg()
 root.mainloop()
