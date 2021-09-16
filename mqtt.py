@@ -1,6 +1,9 @@
 import json
 import time
+
 import paho.mqtt.client as mqtt
+
+from util import Hex2Rgb
 
 
 class UCMqtt(object):
@@ -103,6 +106,19 @@ class UCMqtt(object):
         return self.client.publish(
             topic, json.dumps(message, ensure_ascii=False), **kwargs
         )
+
+    # 以下为自定义消息
+    def pubLedOn(self, colorHex):
+        """全场亮灯"""
+        self.publish("/S007/LAR01/RECM", "RECT+0+0+8+8+" + Hex2Rgb(colorHex))
+
+    def pubLedOff(self):
+        """全场灭灯"""
+        self.publish("/S007/LAR01/RECM", "CLEAR")
+
+    def pubMotorZ(self, cmd):
+        """移动舵机Z到指定的位置"""
+        self.publish("/S007/MOT01/RECM", cmd)
 
 
 """ mc = UCMqtt()

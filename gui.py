@@ -10,7 +10,6 @@ import cv2
 from PIL import Image, ImageTk
 
 from mqtt import UCMqtt
-from util import Hex2Rgb
 
 configFile = "config.ini"
 cfg = configparser.ConfigParser(comment_prefixes="#")  # 创建配置文件对象
@@ -185,13 +184,13 @@ btnColor.pack()
 def LedOn():
     """将颜色设置发送 mqtt 开灯指令"""
     global labColor, mqclient
-    mqclient.publish("/S007/LAR01/RECM", "RECT+0+0+8+8+" + Hex2Rgb(labColor.cget("bg")))
+    mqclient.pubLedOn(labColor.cget("bg"))
 
 
 def LedOff():
     """发送 mqtt 关灯指令"""
     global mqclient
-    mqclient.publish("/S007/LAR01/RECM", "CLEAR")
+    mqclient.pubLedOff()
 
 
 btnLedOn = tk.Button(fLed, text=_("LedOn"), command=LedOn)
@@ -212,7 +211,7 @@ def MotroMove():
         cmd = "DRVZ" + str(motorValue.get())
     else:
         cmd = "DRVZ+" + str(motorValue.get())
-    mqclient.publish("/S007/MOT01/RECM", cmd)
+    mqclient.pubMotorZ(cmd)
 
 
 motorValue = tk.IntVar()
