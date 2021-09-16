@@ -168,19 +168,22 @@ btnRecord = tk.Button(
     lfCam, text=_("Start Record"), width=10, height=2, command=isVideoRecord
 )
 btnRecord.grid(row=2, column=1, columnspan=2)
+
 # 右面板的 LED 标签页
 labColor = tk.Label(fLed, text=_("Color Preview"), height=5, width=25)  # 颜色预览标签
 labColor.grid(row=0, column=0, columnspan=2)
 if cfg.has_option("TKINTER", "ledColor"):
     labColor["bg"] = cfg.get("TKINTER", "ledColor")
+else:
+    labColor["bg"] = "#ffffff"
 
 
 def ChooseColor():
     """设置颜色，但先不使设置生效，需要 LedOn 使其生效，避免失误"""
-    r = colorchooser.askcolor(title=_("颜色选择器"))
+    global labColor
+    r = colorchooser.askcolor(title=_("Choose new color"), color=labColor["bg"])
     # ((239, 240, 241), '#eff0f1')
     if r[1]:  # 避免选择 cancel 将 NULL 赋值给 颜色预览标签
-        global labColor
         labColor["bg"] = r[1]
         cfg.set("TKINTER", "ledColor", r[1])
         with open(configFile, "w", encoding="utf-8") as configfile:  # 保存颜色配置
@@ -203,8 +206,8 @@ def LedOff():
     mqclient.pubLedOff()
 
 
-btnLedOn = tk.Button(fLed, text=_("LedOn"), command=LedOn)
-btnLedOff = tk.Button(fLed, text=_("LedOFF"), command=LedOff)
+btnLedOn = tk.Button(fLed, text=_("LedOn"), bg="lightgreen", command=LedOn)
+btnLedOff = tk.Button(fLed, text=_("LedOFF"), bg="tomato", command=LedOff)
 btnLedOn.grid(row=2, column=0)
 btnLedOff.grid(row=2, column=1)
 
