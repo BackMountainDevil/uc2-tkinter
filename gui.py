@@ -3,7 +3,7 @@ import os
 import time
 import tkinter as tk
 from gettext import gettext as _
-from tkinter import colorchooser
+from tkinter import colorchooser, messagebox
 from tkinter.ttk import Notebook, PanedWindow
 
 import cv2
@@ -18,8 +18,16 @@ if not cfg.has_section("TKINTER"):
     cfg.add_section("TKINTER")  # 没有就创建
 
 
+def checkQuit():
+    """再次确认是否关闭程序"""
+    res = messagebox.askokcancel(_("Tip"), _("Are u sure to quit?"))
+    if res:
+        root.destroy()  # 这里不推荐 quit 方法，在 root.mainloop()加 sleep就知道了
+
+
 # 整体布局
 root = tk.Tk()
+root.protocol("WM_DELETE_WINDOW", checkQuit)  # 关闭窗口再次会再次确认
 root.title(_("UC2"))  # 设置窗口的标题
 root.geometry("640x480")  # 设置窗口的大小
 
