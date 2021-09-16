@@ -25,6 +25,8 @@ ImportError: libtk8.6.so: cannot open shared object file: No such file or direct
 
 /UC2-Software-GIT/HARDWARE_CONTROL/ESP32/README.md
 
+本次实验中设置的不是 S007，是 S001,下面只是举一个例子
+
 ## 安装 mosquitto 
 sudo pacman -S mosquitto
 sudo apt-get install mosquitto mosquitto-clients
