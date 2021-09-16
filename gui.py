@@ -88,7 +88,7 @@ def ChooseColor():
     """设置颜色，但先不使设置生效，需要 LedOn 使其生效，避免失误"""
     r = colorchooser.askcolor(title=_("颜色选择器"))
     # ((239, 240, 241), '#eff0f1')
-    if r:  # 避免选择 cancel 将 NULL 赋值给 颜色预览标签
+    if r[1]:  # 避免选择 cancel 将 NULL 赋值给 颜色预览标签
         global labColor
         labColor["bg"] = r[1]
         cfg.set("TKINTER", "ledColor", r[1])
