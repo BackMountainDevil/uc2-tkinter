@@ -62,12 +62,13 @@ def ShowImg():
 
 def ImageSave():
     """将摄像头画面保存为 拍摄时间.jpg 文件"""
-    global Cap
+    global Cap, CapDir
     timestr = time.strftime("%Y%m%d_%H%M%S")
     filename = "{}.jpg".format(timestr)
     ref, frame = Cap.read()
     frame = cv2.flip(frame, 1)
-    cv2.imwrite(filename, frame)
+    filepath = os.path.join(os.getcwd(), CapDir)
+    cv2.imwrite(os.path.join(filepath, filename), frame)
 
 
 def VideoRecord():
