@@ -21,6 +21,40 @@ ImportError: libtk8.6.so: cannot open shared object file: No such file or direct
 
 根据 [tkdocs install](https://tkdocs.com/tutorial/install.html#installlinux) 中对 linux 发行版的介绍，应该是可以在包管理器中找到这个包的，如 `sudo apt-get install python3-tk`，在 Arch 系列中，可以通过 `sudo pacman -S tk` 来安装 [tk](https://bbs.archlinux.org/viewtopic.php?id=260449)，此时再通过 `python -m tkinter` 测试就会出现一个窗体程序了。
 
+# mqtt
+
+/UC2-Software-GIT/HARDWARE_CONTROL/ESP32/README.md
+
+## LED
+
+|COMMAND|RANGE|EXAMPLE|
+|---|---|---|
+|NA|UINT8 [0...4]|"NA+4"| 
+|PXL|UINT8 [0...64,0...255,0...255,0...255] = [pixelNBR,R,G,B]|"PXL+20+127+255+50"|
+|HLINE|UINT8 [0...8,0...8,0...8,0...8,0...255,0...255,0...255] = [x,y,w,h,R,G,B]|"HLINE+0+2+8+1+120+120+120" -> not active|
+|VLINE|UINT8 [0...8,0...8,0...8,0...8,0...255,0...255,0...255] = [x,y,w,h,R,G,B]|"VLINE+0+2+8+1+10+10+90" -> not active|
+|RECT|UINT8 [0...8,0...8,0...8,0...8,0...255,0...255,0...255] = [x,y,w,h,R,G,B]|"RECT+1+1+3+3+250+130+250"|
+|CIRC|UINT8 [0...255,0...255,0...255] = [R,G,B]|"CIRC+85+86+87" -> not active|
+|LEFT|UINT8 [0...255,0...255,0...255] = [R,G,B]|"LEFT+85+86+87"|
+|RIGHT|UINT8 [0...255,0...255,0...255] = [R,G,B]|"RIGHT+85+86+87"|
+|TOP|UINT8 [0...255,0...255,0...255] = [R,G,B]|"TOP+85+86+87"|
+|BOTTOM|UINT8 [0...255,0...255,0...255] = [R,G,B]|"BOTTOM+85+86+87"|
+|CLEAR|None|"CLEAR"|
+|PRESET|None|"PRESET"|
+|SETPRE|None|"SETPRE"|
+|FLYBY|None|"FLYBY"|
+|ALIVE|None|"ALIVE"|
+
+## Motor Z
+
+步进精度为 10,所以下面的范围的取值应该是 10 的整数倍
+
+|COMMAND|FORMAT & RANGE|EXAMPLE|
+|---|---|---|
+|DRVZ|INT  -10000...10000|"DRVZ+1000", "DRVZ-1000"|
+
+
+
 # 参考
 
 - [Python GUI之tkinter教程](http://www.coolpython.net/tk/tk_primary/index.html)
