@@ -144,6 +144,7 @@ labTime.grid(row=1, column=0, padx=5, pady=5)
 timeGap = tk.IntVar()  # 时间间隔
 sbTime = tk.Spinbox(
     lfCam,
+    value=30,  # 拍摄间隔默认值（秒）
     from_=0,  # 最小值
     to=1000,  # 最大值
     increment=1,  # 点击一次变化幅度为 1
