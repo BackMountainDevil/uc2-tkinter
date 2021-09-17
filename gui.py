@@ -102,14 +102,15 @@ def VideoRecord():
 
 
 def isVideoRecord():
-    """开始录制或者暂停录制"""
-    global Cap, CapFile, CapDir, isRecord, timeGap, btnRecord, CapDirName
+    """开始录制或结束录制"""
+    global Cap, CapFile, CapDir, isRecord, timeGap, sbTime, btnRecord, CapDirName
     FPS = 25  # 生成视频的帧率
     FRAME_WIDTH = int(Cap.get(cv2.CAP_PROP_FRAME_WIDTH))  # 获取相机帧的宽高
     FRAME_HEIGHT = int(Cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     FORMAT = cv2.VideoWriter_fourcc(*"XVID")  # 固定的文件格式
     if not isRecord:
         isRecord = not isRecord
+        sbTime["state"] = "disable"  # 录制期间禁止修改间隔时间
         btnRecord["text"] = _("Stop Record")
         btnRecord["bg"] = "red"
         timestr = time.strftime("%Y%m%d_%H%M%S")
@@ -124,7 +125,8 @@ def isVideoRecord():
             filefullpath, FORMAT, FPS, (FRAME_WIDTH, FRAME_HEIGHT)
         )
     else:
-        isRecord = False  # 暂停录制
+        isRecord = False  # 结束录制
+        sbTime["state"] = "normal"  # 恢复允许修改间隔时间
         btnRecord["text"] = _("Start Record")
         btnRecord["bg"] = "#eff0f1"
         CapFile = None
@@ -160,7 +162,7 @@ sbTime = tk.Spinbox(
     width=10,
 )
 sbTime.grid(row=1, column=2, padx=5, pady=5)
-print(sbTime.keys())
+
 btn_snap = tk.Button(lfCam, text=_("SNAP"), width=5, height=2, command=ImageSave)
 btn_snap.grid(row=2, column=0)
 
