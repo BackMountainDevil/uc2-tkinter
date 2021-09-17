@@ -1,5 +1,29 @@
+# 快速入门
 
-#
+1. 获取代码
+2. 修改配置
+- mqtt 中的 broker 信息，自定义指令中的设备标识 Sxxx
+
+3. 准备环境
+- Python 3.x
+- tkinter（一般都需要额外安装）
+
+4. 安装依赖包
+
+```bash
+# 建立虚拟环境（非必须）
+python -m venv env
+# 激活虚拟环境，同上
+source env/bin/activate
+
+# 安装依赖，必须
+pip install -r requirement.txt 
+```
+5. 运行程序
+
+```bash
+python gui.py
+```
 
 # 安装 tkinter
 
