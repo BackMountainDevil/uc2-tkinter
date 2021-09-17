@@ -94,7 +94,14 @@ def VideoRecord():
 
         else:
             print("Can't receive frame (stream end?)")
-    delayTime = timeGap.get()  # 单位：秒
+
+    try:  # 输入校验
+        delayTime = timeGap.get()  # 单位：秒
+    except Exception as e:
+        print("Function VideoRecord: ", e)
+        checkTimeGap()
+        delayTime = timeGap.get()
+
     if delayTime < 3:  # 0 会运行异常
         delayTime = 3
         print(_("Warning: Time is less than 3! It will be set to 3"))
@@ -104,6 +111,8 @@ def VideoRecord():
 def isVideoRecord():
     """开始录制或结束录制"""
     global Cap, CapFile, CapDir, isRecord, timeGap, sbTime, btnRecord, CapDirName
+    if not checkTimeGap():  # 强制检查输入
+        return False
     FPS = 25  # 生成视频的帧率
     FRAME_WIDTH = int(Cap.get(cv2.CAP_PROP_FRAME_WIDTH))  # 获取相机帧的宽高
     FRAME_HEIGHT = int(Cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -114,8 +123,9 @@ def isVideoRecord():
         btnRecord["text"] = _("Stop Record")
         btnRecord["bg"] = "red"
         timestr = time.strftime("%Y%m%d_%H%M%S")
-        filename = "{}_{}.avi".format(timestr, timeGap.get())  # 文件名:时间_间隔时间.avi
-        CapDirName = "{}_{}".format(timestr, timeGap.get())
+        delayTime = timeGap.get()
+        filename = "{}_{}.avi".format(timestr, delayTime)  # 文件名:时间_间隔时间.avi
+        CapDirName = "{}_{}".format(timestr, delayTime)
         filepath = os.path.join(os.getcwd(), CapDir, CapDirName)
         if not os.path.exists(filepath):  # 文件路径检测
             os.makedirs(filepath)
@@ -130,6 +140,27 @@ def isVideoRecord():
         btnRecord["text"] = _("Start Record")
         btnRecord["bg"] = "#eff0f1"
         CapFile = None
+        print(_("Stop record"))
+
+
+def checkTimeGap():
+    """对用户的拍摄间隔时间进行合法性验证"""
+    global timeGap
+    try:
+        delayTime = timeGap.get()  # 字符数据会触发异常，小数会自动转化为整数
+        print("delayTime: ", delayTime)
+        if isinstance(delayTime, int):  # 整数验证，这一步似乎多余
+            return True
+        else:
+            return False
+    except Exception as e:
+        print(e)
+        timeGap.set(30)
+        messagebox.showerror(
+            _("Error"),
+            _("The time format you input is invalid\nSet it to Integer like 30"),
+        )
+        return False
 
 
 Cap = cv2.VideoCapture(0)  # 创建摄像头对象
@@ -160,6 +191,8 @@ sbTime = tk.Spinbox(
     increment=1,  # 点击一次变化幅度为 1
     textvariable=timeGap,
     width=10,
+    validate="key",  # 当输入框被编辑的时候调用校验
+    validatecommand=checkTimeGap,  # 校验函数
 )
 sbTime.grid(row=1, column=2, padx=5, pady=5)
 
