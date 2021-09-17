@@ -148,7 +148,6 @@ def checkTimeGap():
     global timeGap
     try:
         delayTime = timeGap.get()  # 字符数据会触发异常，小数会自动转化为整数
-        print("delayTime: ", delayTime)
         if isinstance(delayTime, int):  # 整数验证，这一步似乎多余
             return True
         else:
