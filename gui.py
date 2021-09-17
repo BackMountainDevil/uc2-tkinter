@@ -150,9 +150,9 @@ labTime = tk.Label(lfCam, text=_("Time(s)"))  # 时间标签
 labTime.grid(row=1, column=0, padx=5, pady=5)
 
 timeGap = tk.IntVar()  # 时间间隔
+timeGap.set(30)  # 拍摄间隔默认值（秒）
 sbTime = tk.Spinbox(
     lfCam,
-    value=30,  # 拍摄间隔默认值（秒）
     from_=0,  # 最小值
     to=1000,  # 最大值
     increment=1,  # 点击一次变化幅度为 1
@@ -160,7 +160,7 @@ sbTime = tk.Spinbox(
     width=10,
 )
 sbTime.grid(row=1, column=2, padx=5, pady=5)
-
+print(sbTime.keys())
 btn_snap = tk.Button(lfCam, text=_("SNAP"), width=5, height=2, command=ImageSave)
 btn_snap.grid(row=2, column=0)
 
