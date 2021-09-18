@@ -103,9 +103,7 @@ class UCMqtt(object):
 
     def publish(self, topic, message, **kwargs):
         """publish message through topic"""
-        return self.client.publish(
-            topic, json.dumps(message, ensure_ascii=False), **kwargs
-        )
+        return self.client.publish(topic, message)
 
     # 以下为自定义消息
     def pubLedOn(self, colorHex):
