@@ -31,7 +31,7 @@
 // ----------------------------------------------------------------------------------------------------------------
 //                          Parameters
 // saved in strings, so that later (if implemented) e.g. easily changeable via Bluetooth -> to avoid connection errors
-std::string SETUP = "S007";
+std::string SETUP = "S001";// "S007";
 std::string COMPONENT = "LAR01";
 std::string DEVICE = "ESP32";
 std::string DEVICENAME;
@@ -45,6 +45,7 @@ WiFiClient espClient;
 PubSubClient client(espClient);
 // ~~~~  MQTT  ~~~~
 const char *MQTT_SERVER = "";
+const int MQTT_PORT = 1883;
 const char *MQTT_CLIENTID;
 const char *MQTT_USER;
 const char *MQTT_PASS = "23SPE";
@@ -103,10 +104,10 @@ void uc2wait(int period)
 }
 void matrix_show()
 {
-    portDISABLE_INTERRUPTS(); // transmission to array should no be interrupted
+    // portDISABLE_INTERRUPTS(); // transmission to array should no be interrupted
     matrix.show();
     matrix.show();           // to remove glitchy green corner
-    portENABLE_INTERRUPTS(); // restore back interrupts
+    // portENABLE_INTERRUPTS(); // restore back interrupts
 }
 void setup_device_properties()
 {
@@ -505,7 +506,11 @@ void setup()
     Serial.print("VOID SETUP -> topicSTATUS=");
     Serial.println(stopicSTATUS.c_str());
     setup_wifi();
-    client.setServer(MQTT_SERVER, 1883);
+    Serial.print("Starting to connect MQTT to: ");
+    Serial.print(MQTT_SERVER);
+    Serial.print(" at port:");
+    Serial.println(MQTT_PORT);
+    client.setServer(MQTT_SERVER, MQTT_PORT);
     client.setCallback(callback);
     pinMode(LED_BUILTIN, OUTPUT);
     time_now = millis();
