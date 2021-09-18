@@ -4,15 +4,14 @@
 // date: 11.09.2019
 // based on Arduino-Interface by Rene Lachmann, Xavier Uwurukundu
 //----------- ----------- ----------- ----------- ----------- -----------
-
+// 2020-09-18 revise Kearney
 // ----------------------------------------------------------------------------------------------------------------
 //                          INCLUDES
 #include <WiFi.h>
 #include <PubSubClient.h>
 #include <string.h>
 #include <vector>
-#include <StepMotor.h>
-#include "driver/ledc.h"
+#include <CheapStepper.h>
 #include <ctime>
 #include <sstream>
 // ----------------------------------------------------------------------------------------------------------------
@@ -21,9 +20,7 @@
 #define MAX_INST 10
 #define NCOMMANDS 15
 #define MAX_MSG_LEN 40
-#define LED_BUILTIN 11
 #define LED_FLUO_PIN 26
-
 // ----------------------------------------------------------------------------------------------------------------
 //                          Parameters
 // ~~~~ Device ~~~~
@@ -61,10 +58,7 @@ const char *delim_inst = "+";
 const int delim_len = 1;
 
 // ~~~~ MOTOR ~~~~
-StepMotor stepperZ = StepMotor(25, 26, 27, 14); //normally: 25, 26, 27, 14 // 12, 14, 27, 26
-StepMotor stepperY = StepMotor(5, 17, 16, 4);
-StepMotor stepperX = StepMotor(33, 32, 27, 14); // 27, 25, 32, 4 never connected to same ESP32 as stepperZ -> hence: universally possible
-
+CheapStepper stepperZ (25,26,27,14); 
 // ~~~~ FLUO ~~~~
 int led_fluo_pwm_frequency = 12000;
 int led_fluo_pwm_channel = 0;
@@ -92,21 +86,7 @@ void uc2wait(int period)
         //wait approx. [period] ms
     };
 }
-// Random-string generation from: https://stackoverflow.com/a/12468109
-/*std::string random_string(size_t length)
-{
-    auto randchar = []() -> char {
-        const char charset[] =
-            "0123456789"
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            "abcdefghijklmnopqrstuvwxyz";
-        const size_t max_index = (sizeof(charset) - 1);
-        return charset[rand() % max_index];
-    };
-    std::string str(length, 0);
-    std::generate_n(str.begin(), length, randchar);
-    return str;
-}*/
+
 
 void setup_device_properties()
 {
@@ -127,7 +107,7 @@ void setup_device_properties()
 
 void setup_wifi()
 {
-    uc2wait(10);
+    // uc2wait(10);
     // We start by connecting to a WiFi network
     Serial.println();
     Serial.print("Device-MAC: ");
@@ -138,7 +118,8 @@ void setup_wifi()
     WiFi.begin(ssid, password);
     while (WiFi.status() != WL_CONNECTED)
     {
-        uc2wait(500);
+        // uc2wait(500);
+        delay(100);
         Serial.print(".");
     }
 
@@ -222,25 +203,41 @@ void callback(char *topic, byte *message, unsigned int length)
     // test topics
     if (std::string(topic) == stopicREC)
     {
-        //Serial.println(topicREC.c_str());
         int nINST = separateMessage(message, length);
+        Serial.print("INSTS[0] ");
+        Serial.println(INSTS[0]);
         if (strcmp(CMD, COMMANDSET[0]) == 0)
         {
-            //Serial.print(INSTS[0] * 10);
-            stepperX.Move((int)(INSTS[0] * 10));
         }
         else if (strcmp(CMD, COMMANDSET[1]) == 0)
         {
-            stepperY.Move((int)(INSTS[0] * 10));
         }
         else if (strcmp(CMD, COMMANDSET[2]) == 0)
         {
-            stepperZ.Move(INSTS[0] * 10);
+            if( INSTS[0]>0){
+                Serial.println("CW");
+                stepperZ.moveDegreesCW(INSTS[0]);
+                Serial.print("step position: ");
+                Serial.print(stepperZ.getStep());
+                Serial.print(" / 4096");
+                Serial.println();
+                delay(1000);
+            }             
+            else{
+                Serial.println("CCW");
+                stepperZ.moveDegreesCCW(0-INSTS[0]);
+                Serial.print("step position: ");
+                Serial.print(stepperZ.getStep());
+                Serial.print(" / 4096");
+                Serial.println();
+                delay(1000);
+            }
+                
+            // stepperZ.Move(INSTS[0] * 10);
         }
         else if (strcmp(CMD, COMMANDSET[3]) == 0)
         {
-            //analogWrite(FLUO_PIN, INSTS[0]);
-            ledcWrite(led_fluo_pwm_channel, INSTS[0]);
+
         }
         else
         {
@@ -312,20 +309,8 @@ void setup()
     Serial.println(MQTT_PORT);
     client.setServer(MQTT_SERVER, MQTT_PORT);
     client.setCallback(callback);
-    pinMode(LED_BUILTIN, OUTPUT);
     time_now = millis();
-    //testCPP();
-    // ---> pinMode(LED_BUILTIN, OUTPUT);
-    // ---> pinMode(LED_FLUO_PIN, OUTPUT);
-    ledcSetup(led_fluo_pwm_channel, led_fluo_pwm_frequency, led_fluo_pwm_resolution);
-    ledcAttachPin(LED_FLUO_PIN, led_fluo_pwm_channel);
-    ledcWrite(led_fluo_pwm_channel, 20); //analogWrite(FLUO_PIN, 20);
-    uc2wait(1000);
-    ledcWrite(led_fluo_pwm_channel, 0); //analogWrite(FLUO_PIN, 0,0);
-    uc2wait(100);
-    stepperX.SetSpeed(10);
-    stepperY.SetSpeed(10);
-    stepperZ.SetSpeed(10);
+    stepperZ.setRpm(15);
 }
 // ----------------------------------------------------------------------------------------------------------------
 //                          LOOP
