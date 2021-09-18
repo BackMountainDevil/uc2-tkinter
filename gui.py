@@ -254,10 +254,7 @@ def MotroMove():
     """
     global motorValue, mqclient
     value = motorValue.get()
-    if value < 0:
-        cmd = "DRVZ" + str(motorValue.get())
-    else:
-        cmd = "DRVZ+" + str(motorValue.get())
+    cmd = "DRVZ+" + str(value)
     mqclient.pubMotorZ(cmd)
 
 
