@@ -26,7 +26,13 @@ def checkQuit():
 
 
 # 整体布局
-root = tk.Tk()
+try:
+    global root
+    root = tk.Tk()
+except Exception as e:
+    print(e)
+    print(_("Please run this app in Desktop environment. App shutdown now\n"))
+    exit(0)
 root.protocol("WM_DELETE_WINDOW", checkQuit)  # 关闭窗口再次会再次确认
 root.title(_("UC2"))  # 设置窗口的标题
 root.geometry("640x480")  # 设置窗口的大小
