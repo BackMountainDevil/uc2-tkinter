@@ -90,6 +90,12 @@ nb.pack(padx=5, pady=5, fill=tk.BOTH, expand=True)
 # 左面版
 
 
+def ensurePath(filepath):
+    """文件路径检测,不存在就创建"""
+    if not os.path.exists(filepath):
+        os.makedirs(filepath)
+
+
 def ShowImg():
     """获取摄像头画面，并显示在 label 上"""
     global labCam, Cap
@@ -132,7 +138,6 @@ def VideoRecord():
             filepath = os.path.join(os.getcwd(), CapDir, CapDirName)
             cv2.imwrite(os.path.join(filepath, filename), frame)  # 保存图片，以防断电
             CapFile.write(frame)  # 将画面写入视频文件
-
         else:
             print("Can't receive frame (stream end?)")
 
@@ -168,8 +173,7 @@ def isVideoRecord():
         filename = "{}_{}.avi".format(timestr, delayTime)  # 文件名:时间_间隔时间.avi
         CapDirName = "{}_{}".format(timestr, delayTime)
         filepath = os.path.join(os.getcwd(), CapDir, CapDirName)
-        if not os.path.exists(filepath):  # 文件路径检测
-            os.makedirs(filepath)
+        ensurePath(filepath)
         filefullpath = os.path.join(filepath, filename)
         log.logger.debug(_("Start record to file: %s"), filefullpath)
         CapFile = cv2.VideoWriter(
@@ -211,6 +215,7 @@ if cfg.has_option("TKINTER", "CapDir"):
 else:
     CapDir = "output"  # 默认值
 CapDirName = ""  # 视频（图像）文件的二级目录,程序自动创建：时间_间隔时间
+ensurePath(os.path.join(os.getcwd(), CapDir))  # 确保 snap 拍摄的时候存在路径
 isRecord = False  # 暂停录制
 
 
