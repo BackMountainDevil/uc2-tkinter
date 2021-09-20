@@ -1,16 +1,22 @@
+#!/usr/bin/env python3
+# -*- encoding: UTF-8 -*-
+import sys  # for python version check
+
+if not sys.version_info >= (3,):  # if python2
+    print(
+        "Your python version is:",
+        sys.version_info,
+        ".Please run this with python 3. Exit now",
+    )
+    exit(0)
+
 import configparser
 import os
-import sys  # for python version check
 import time
 import tkinter as tk
 from gettext import gettext as _
 from tkinter import colorchooser, messagebox
 from tkinter.ttk import Notebook, PanedWindow
-
-if not sys.version_info >= (3,):  # if python2
-    print(_("Your python version is: "), sys.version_info.major)
-    print(_("Please run this with python 3. Exit now"))
-    exit(0)
 from mqtt import UCMqtt
 from util import Logger
 
