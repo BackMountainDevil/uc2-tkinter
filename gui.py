@@ -1,13 +1,38 @@
 import configparser
 import os
+import sys  # for python version check
 import time
 import tkinter as tk
 from gettext import gettext as _
 from tkinter import colorchooser, messagebox
 from tkinter.ttk import Notebook, PanedWindow
 
-import cv2
-from PIL import Image, ImageTk
+if not sys.version_info >= (3,):  # if python2
+    print(_("Your python version is: "), sys.version_info.major)
+    print(_("Please run this with python 3. Exit now"))
+    exit(0)
+
+try:
+    import cv2
+except ImportError as i:
+    print(i)
+    print(_("Maybe you should try this: sudo apt install python3-opencv"))
+    print(_("If not help, this error happens when python3.7 venv module on ras pi"))
+    print(
+        _("So try no use venv. This once happen on pi. On x86 venv is fine. Exit now")
+    )
+    exit(0)
+
+
+try:
+    from PIL import Image, ImageTk
+except ImportError as i:
+    print(i)
+    print(
+        _("Maybe you should try this: sudo apt install python3-pil python3-pil.imagetk")
+    )
+    exit(0)
+
 
 from mqtt import UCMqtt
 
