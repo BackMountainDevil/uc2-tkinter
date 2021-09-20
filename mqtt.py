@@ -118,8 +118,11 @@ class UCMqtt(object):
         self.publish("/S001/MOT01/RECM", cmd)
 
 
-""" mc = UCMqtt()
-mc.connect()
-mc.subscribe("S0/MOTz1/MOV", qos=1)
-mc.publish("S0/MOTz1/MOV", "1000", qos=1, retain=False)
-time.sleep(10) """
+if __name__ == "__main__":
+    # import 此类不会运行此测试代码
+    # 测试代码，用 mosquitto_sub -v -t /S001/MOT01/RECM 进行接收测试
+    mc = UCMqtt()
+    mc.connect()
+    mc.subscribe("S001/MOT01/RECM", qos=1)
+    mc.publish("S001/MOT01/RECM", "1000", qos=1, retain=False)
+    time.sleep(10)
