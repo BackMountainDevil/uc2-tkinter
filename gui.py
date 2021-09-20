@@ -37,7 +37,8 @@ except ImportError as i:
 from mqtt import UCMqtt
 
 configFile = "config.ini"
-cfg = configparser.ConfigParser(comment_prefixes="#")  # 创建配置文件对象
+cfg = configparser.RawConfigParser()  # 创建配置文件对象
+cfg.optionxform = lambda option: option  # 重载键值存储时不重置为小写
 cfg.read(configFile, encoding="utf-8")  # 读取配置文件，没有就创建
 if not cfg.has_section("TKINTER"):
     cfg.add_section("TKINTER")  # 没有就创建
