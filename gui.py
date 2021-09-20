@@ -11,15 +11,17 @@ if not sys.version_info >= (3,):  # if python2
     print(_("Your python version is: "), sys.version_info.major)
     print(_("Please run this with python 3. Exit now"))
     exit(0)
+from mqtt import UCMqtt
+from util import Logger
+
+log = Logger("uc2.log", level="debug")  # 全局记录
+
 
 try:
     import cv2
 except ImportError as i:
-    print(i)
-    print(_("Maybe you should try this: sudo apt install python3-opencv"))
-    print(_("If not help, this error happens when python3.7 venv module on ras pi"))
-    print(
-        _("So try no use venv. This once happen on pi. On x86 venv is fine. Exit now")
+    log.logger.error(
+        _("%s\nMaybe you should try this: sudo apt install python3-opencv"), i
     )
     exit(0)
 
@@ -27,14 +29,11 @@ except ImportError as i:
 try:
     from PIL import Image, ImageTk
 except ImportError as i:
-    print(i)
-    print(
-        _("Maybe you should try this: sudo apt install python3-pil python3-pil.imagetk")
+    log.logger.error(
+        _("%s\nTry this: sudo apt install python3-pil python3-pil.imagetk"), i
     )
     exit(0)
 
-
-from mqtt import UCMqtt
 
 configFile = "config.ini"
 cfg = configparser.RawConfigParser()  # 创建配置文件对象
@@ -56,9 +55,11 @@ try:
     global root
     root = tk.Tk()
 except Exception as e:
-    print(e)
-    print(_("Please run this app in Desktop environment. App shutdown now\n"))
+    log.logger.error(
+        _("%s\nPlease run this app in Desktop environment. App shutdown now"), e
+    )
     exit(0)
+
 root.protocol("WM_DELETE_WINDOW", checkQuit)  # 关闭窗口再次会再次确认
 root.title(_("UC2"))  # 设置窗口的标题
 root.geometry("640x480")  # 设置窗口的大小
@@ -108,7 +109,9 @@ def ImageSave():
     ref, frame = Cap.read()
     frame = cv2.flip(frame, 1)
     filepath = os.path.join(os.getcwd(), CapDir)
-    cv2.imwrite(os.path.join(filepath, filename), frame)
+    filefullpath = os.path.join(filepath, filename)
+    cv2.imwrite(filefullpath, frame)
+    log.logger.debug(_("Snap to file: %s"), filefullpath)
 
 
 def VideoRecord():
@@ -162,7 +165,7 @@ def isVideoRecord():
         if not os.path.exists(filepath):  # 文件路径检测
             os.makedirs(filepath)
         filefullpath = os.path.join(filepath, filename)
-        print(_("Start record to file: "), filefullpath)
+        log.logger.debug(_("Start record to file: %s"), filefullpath)
         CapFile = cv2.VideoWriter(
             filefullpath, FORMAT, FPS, (FRAME_WIDTH, FRAME_HEIGHT)
         )
@@ -172,7 +175,7 @@ def isVideoRecord():
         btnRecord["text"] = _("Start Record")
         btnRecord["bg"] = "#eff0f1"
         CapFile = None
-        print(_("Stop record"))
+        log.logger.debug(_("Stop record"))
 
 
 def checkTimeGap():
@@ -303,7 +306,7 @@ btnMotor = tk.Button(fMotor, text=_("MOVE"), width=25, height=2, command=MotroMo
 btnMotor.grid(row=1, column=0, columnspan=2)
 
 
-mqclient = UCMqtt()  # 创建 mqtt 对象实例
+mqclient = UCMqtt(log)  # 创建 mqtt 对象实例
 mqclient.connect()  # 连接 broker
 
 
@@ -312,4 +315,4 @@ VideoRecord()  # 录制事件
 root.mainloop()
 Cap.release()
 cv2.destroyAllWindows()
-print(_("app close"))
+log.logger.debug(_("app close"))
