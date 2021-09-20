@@ -38,7 +38,7 @@ class Logger(object):
         self,
         filename,
         level="info",
-        when="W",
+        when="W0",
         backCount=0,
         fmC='%(levelname)s: %(message)s. File "%(pathname)s", line:%(lineno)d',
         fmF='%(levelname)s: %(message)s. In %(module)s %(funcName)s %(asctime)s \n\tFile "%(pathname)s", line:%(lineno)d',
@@ -46,7 +46,7 @@ class Logger(object):
         """
         filename: 日志文件名称
         level:  日志级别
-        when:   分割文件周期： W 每周、D 每日、 H 每小时
+        when:   分割文件周期： W0 每周一、D 每日、 H 每小时
         backCount: 保留的备份文件的个数，多了旧的会被删除
         fmC:    日志输出到控制台的格式
         fmF:    日志文件的记录格式
