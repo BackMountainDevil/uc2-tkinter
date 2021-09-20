@@ -39,8 +39,6 @@ class UCMqtt(object):
             self.client.connect(self.broker, self.port, self.keepalive)
             while not self.connected_flag and not self.bad_connection_flag:
                 self.log.logger.debug("MQTTClient: Waiting for established connection.")
-
-                print("")
                 time.sleep(1)
             if self.bad_connection_flag:
                 self.client.loop_stop()
@@ -69,12 +67,15 @@ class UCMqtt(object):
         """
         if rc == 0:
             self.connected_flag = True
-            print(
-                "MQTTClient: Connection established successfuly with result code "
-                + str(rc)
+            self.log.logger.debug(
+                "MQTTClient: Connection established successfuly with result code: %s",
+                rc,
             )
         else:
-            print("MQTTClient: Connection establish ERROR with result code " + str(rc))
+            self.log.logger.debug(
+                "MQTTClient: Connection established ERROR with result code: %s",
+                rc,
+            )
             self.bad_connection_flag = True
 
     def on_subscribe(self, client, userdata, mid, granted_qos):
@@ -86,14 +87,12 @@ class UCMqtt(object):
         handle the message when a PUBLISH message is received from the server
         handlers should not set blocked
         """
-        print("Time on receive={0}".format(time.asctime(time.localtime(time.time()))))
-        print(
-            "Received={0}\nTopic={1}\nQOS={2}\nRetain Flag={3}".format(
-                message.payload.decode("utf-8"),
-                message.topic,
-                message.qos,
-                message.retain,
-            )
+        self.log.logger.debug(
+            "Receice msg Topic: %s Payload: %s QoS: %s Retain Flag: %s",
+            message.topic,
+            message.payload.decode("utf-8"),
+            message.qos,
+            message.retain,
         )
 
     def subscribe(self, topic, **kwargs):
@@ -109,6 +108,7 @@ class UCMqtt(object):
 
     def publish(self, topic, message, **kwargs):
         """publish message through topic"""
+        self.log.logger.debug("Publish Topic: %s Payload: %s", topic, message)
         return self.client.publish(topic, message)
 
     # 以下为自定义消息
