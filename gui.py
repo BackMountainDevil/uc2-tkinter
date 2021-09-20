@@ -51,9 +51,15 @@ if not cfg.has_section("TKINTER"):
 
 def checkQuit():
     """再次确认是否关闭程序"""
-    res = messagebox.askokcancel(_("Tip"), _("Are u sure to quit?"))
-    if res:
-        root.destroy()  # 这里不推荐 quit 方法，在 root.mainloop()加 sleep就知道了
+    global isRecord
+    if isRecord:
+        messagebox.showwarning(
+            _("Warning"), _("Record task is running. Turn it off before exit")
+        )
+    else:
+        res = messagebox.askokcancel(_("Tip"), _("Are u sure to quit?"))
+        if res:
+            root.destroy()  # 这里不推荐 quit 方法，在 root.mainloop()加 sleep就知道了
 
 
 # 整体布局
