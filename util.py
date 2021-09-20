@@ -41,7 +41,7 @@ class Logger(object):
         when="W0",
         backCount=0,
         fmC='%(levelname)s: %(message)s. File "%(pathname)s", line:%(lineno)d',
-        fmF='%(levelname)s: %(message)s. In %(module)s %(funcName)s %(asctime)s \n\tFile "%(pathname)s", line:%(lineno)d',
+        fmF='%(levelname)s: %(message)s. In %(module)s %(funcName)s %(asctime)s \n\tFile "%(pathname)s", line:%(lineno)d',  # noqa
     ):
         """
         filename: 日志文件名称
