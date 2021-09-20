@@ -103,7 +103,7 @@ mosquitto_pub -t /S001/LAR01/RECM -m "RECT+0+0+8+8+0+255+0"
 
 |COMMAND|FORMAT & RANGE|EXAMPLE|
 |---|---|---|
-|DRVZ|INT  -10000...10000|"DRVZ+1000", "DRVZ-1000"|
+|DRVZ|INT  -10000...10000|"DRVZ+1000", "DRVZ+-1000"|
 
 # FAQ
 1. raspi install opencv
