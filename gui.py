@@ -18,9 +18,9 @@ from gettext import gettext as _
 from tkinter import colorchooser, messagebox
 from tkinter.ttk import Notebook, PanedWindow
 from mqtt import UCMqtt
-from util import Logger
+from util import Logger, ensurePath
 
-log = Logger("uc2.log", level="debug")  # 全局记录
+log = Logger(level="debug")  # 全局记录
 
 
 try:
@@ -94,12 +94,6 @@ nb.add(fMotor, text=_("Motor"))
 nb.pack(padx=5, pady=5, fill=tk.BOTH, expand=True)
 
 # 左面版
-
-
-def ensurePath(filepath):
-    """文件路径检测,不存在就创建"""
-    if not os.path.exists(filepath):
-        os.makedirs(filepath)
 
 
 def ShowImg():

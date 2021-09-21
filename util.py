@@ -1,4 +1,6 @@
+import configparser
 import logging
+import os
 from logging import handlers
 
 
@@ -23,6 +25,31 @@ def Hex2Rgb(hex="#ffffff"):
     return rgb
 
 
+def ensurePath(filepath):
+    """文件路径检测,不存在就创建"""
+    if not os.path.exists(filepath):
+        os.makedirs(filepath)
+
+
+def getDefalultFileDir(filename, configFile="config.ini"):
+    """从配置文件中，获取日志文件路径,没有就默认 /log/logging.log"""
+    if not filename:
+        cfg = configparser.RawConfigParser()  # 创建配置文件对象
+        cfg.optionxform = lambda option: option  # 重载键值存储时不重置为小写
+        cfg.read(configFile, encoding="utf-8")  # 读取配置文件，没有就创建
+        if not cfg.has_section("LOG"):
+            cfg.add_section("LOG")  # 没有就创建
+        if cfg.has_option("LOG", "fileDir") and cfg.has_option("LOG", "fileName"):
+            fileDir = cfg.get("LOG", "fileDir")
+            fileName = cfg.get("LOG", "fileName")
+            filename = os.path.join(os.getcwd(), fileDir, fileName)
+        else:
+            fileDir = os.path.join(os.getcwd(), "log")
+            filename = os.path.join(fileDir, "logging.log")
+        ensurePath(fileDir)
+    return filename
+
+
 class Logger(object):
     """日志记录类：屏幕输出提示与文件长期记录"""
 
@@ -36,7 +63,7 @@ class Logger(object):
 
     def __init__(
         self,
-        filename,
+        filename=None,
         level="info",
         when="W0",
         backCount=0,
@@ -51,6 +78,7 @@ class Logger(object):
         fmC:    日志输出到控制台的格式
         fmF:    日志文件的记录格式
         """
+        filename = getDefalultFileDir(filename)  # 获取默认文件名称
         self.logger = logging.getLogger(filename)
         self.logger.setLevel(self.level_relations.get(level))  # 设置日志级别
 
