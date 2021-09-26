@@ -96,6 +96,12 @@ nb.pack(padx=5, pady=5, fill=tk.BOTH, expand=True)
 # 左面版
 
 
+def ShowDir():
+    """显示输出目录"""
+    global CapDir
+    messagebox.showinfo(_("Output dir"), CapDir)
+
+
 def ShowImg():
     """获取摄像头画面，并显示在 label 上"""
     global labCam, Cap
@@ -120,8 +126,7 @@ def ImageSave():
     filename = "{}.jpg".format(timestr)
     ref, frame = Cap.read()
     frame = cv2.flip(frame, 1)
-    filepath = os.path.join(os.getcwd(), CapDir)
-    filefullpath = os.path.join(filepath, filename)
+    filefullpath = os.path.join(CapDir, filename)
     cv2.imwrite(filefullpath, frame)
     log.logger.debug(_("Snap to file: %s"), filefullpath)
 
@@ -135,7 +140,7 @@ def VideoRecord():
             frame = cv2.flip(frame, 1)
             timestr = time.strftime("%Y%m%d_%H%M%S")
             filename = "{}.jpg".format(timestr)
-            filepath = os.path.join(os.getcwd(), CapDir, CapDirName)
+            filepath = os.path.join(CapDir, CapDirName)
             cv2.imwrite(os.path.join(filepath, filename), frame)  # 保存图片，以防断电
             CapFile.write(frame)  # 将画面写入视频文件
         else:
@@ -172,7 +177,7 @@ def isVideoRecord():
         delayTime = timeGap.get()
         filename = "{}_{}.avi".format(timestr, delayTime)  # 文件名:时间_间隔时间.avi
         CapDirName = "{}_{}".format(timestr, delayTime)
-        filepath = os.path.join(os.getcwd(), CapDir, CapDirName)
+        filepath = os.path.join(CapDir, CapDirName)
         ensurePath(filepath)
         filefullpath = os.path.join(filepath, filename)
         log.logger.debug(_("Start record to file: %s"), filefullpath)
@@ -215,7 +220,8 @@ if cfg.has_option("TKINTER", "CapDir"):
 else:
     CapDir = "output"  # 默认值
 CapDirName = ""  # 视频（图像）文件的二级目录,程序自动创建：时间_间隔时间
-ensurePath(os.path.join(os.getcwd(), CapDir))  # 确保 snap 拍摄的时候存在路径
+CapDir = os.path.join(os.getcwd(), CapDir)  # 变为绝对路径
+ensurePath(CapDir)  # 确保 snap 拍摄的时候存在路径
 isRecord = False  # 暂停录制
 
 
@@ -248,6 +254,11 @@ btnRecord = tk.Button(
     lfCam, text=_("Start Record"), width=10, height=2, command=isVideoRecord
 )
 btnRecord.grid(row=2, column=1, columnspan=2)
+
+btnShowFile = tk.Button(
+    lfCam, text=_("Show Output"), width=15, height=2, command=ShowDir
+)
+btnShowFile.grid(row=3, column=0, columnspan=3)
 
 # 右面板的 LED 标签页
 labColor = tk.Label(fLed, text=_("Color Preview"), height=5, width=25)  # 颜色预览标签
