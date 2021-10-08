@@ -17,6 +17,7 @@ import tkinter as tk
 from gettext import gettext as _
 from tkinter import colorchooser, messagebox
 from tkinter.ttk import Notebook, PanedWindow
+
 from mqtt import UCMqtt
 from util import Logger, ensurePath
 
